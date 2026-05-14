@@ -3,25 +3,7 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-# ====================================
-# CONFIG
-# ====================================
-# ====================================
-# LOGO
-# ====================================
 
-st.image(
-    "https://upload.wikimedia.org/wikipedia/id/thumb/5/55/Logo_Unisba.svg/1200px-Logo_Unisba.svg.png",
-    width=150
-)
-
-# ====================================
-# HEADER
-# ====================================
-
-st.title("Analisis Intertemporal Sumber Daya Nikel")
-
-st.subheader("Ekonomi SDA dan Lingkungan")
 st.set_page_config(
     page_title="Analisis Intertemporal Nikel",
     layout="wide"
