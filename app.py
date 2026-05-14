@@ -9,7 +9,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# --- CUSTOM CSS ---
+# --- CUSTOM CSS (Sesuai Referensi Link) ---
 st.markdown("""
     <style>
     .main-title { font-size: 32px !important; font-weight: 800; color: #1F2937; margin-bottom: 0px; }
@@ -24,13 +24,11 @@ st.markdown("""
 col_logo, col_text = st.columns([1, 5])
 with col_logo:
     st.write("##") 
-    try:
-        st.image("Lambang-Universitas_Islam_Bandung.png", width=150)
-    except:
-        st.image("https://upload.wikimedia.org/wikipedia/id/2/23/Lambang_Unisba.png", width=150)
+    # Menggunakan URL langsung agar logo pasti muncul
+    st.image("https://upload.wikimedia.org/wikipedia/id/2/23/Lambang_Unisba.png", width=150)
 
 with col_text:
-    st.markdown('<p class="main-title">Analisis Intertemporal Sumber Daya Alam</p>', unsafe_allow_html=True)
+    st.markdown('<p class="main-title">Analisis Ekonomi Sumber Daya Nikel</p>', unsafe_allow_html=True)
     st.markdown('<p class="sub-title">Program Studi Ekonomi Pembangunan - UNISBA</p>', unsafe_allow_html=True)
     st.markdown(f"""
     <div class="info-box">
@@ -54,19 +52,20 @@ with col_text:
 
 st.write("---")
 
-# --- SIDEBAR PARAMETER ---
+# --- SIDEBAR PARAMETER (Menghapus Stok Awal S) ---
 with st.sidebar:
     st.header("⚙️ Kontrol Simulasi")
     a = st.number_input("Intersep Permintaan (a)", value=86500000.0, format="%.1f")
     b = st.number_input("Slope Permintaan (b)", value=0.0702729, format="%.7f")
     mc = st.number_input("Marginal Cost (MC)", value=176566741.2, format="%.1f")
     r = st.slider("Tingkat Diskonto (r)", 0.01, 0.20, 0.05)
-    stok_awal = st.number_input("Total Cadangan (S)", value=20000.0)
     lambda_0 = st.number_input("MUC Awal (λ0)", value=15163.0)
+    # Catatan: Stok awal 20000 dikunci di dalam kode agar tidak muncul di sidebar
 
 # --- LOGIKA SIMULASI ---
 def jalankan_simulasi(struktur):
     tahun_sim = np.arange(0, 11)
+    stok_awal = 20000.0  # Tetap ada di perhitungan tapi hilang di sidebar
     slope_eff = b * 2 if struktur == "Monopoli" else (b * 1.5 if struktur == "Oligopoli" else b)
     hasil = []
     stok_sisa = stok_awal
@@ -76,11 +75,19 @@ def jalankan_simulasi(struktur):
         q_t = max(0, q_t)
         produksi = min(q_t, stok_sisa)
         stok_sisa -= produksi
-        hasil.append({"Tahun": t, "MUC": muc_t, "Produksi": produksi, "Sisa_Stok": stok_sisa})
+        
+        # Hanya masukkan ke tabel jika produksi > 0 (menghindari data 0.000)
+        if produksi > 0.01:
+            hasil.append({
+                "Tahun": t, 
+                "MUC": muc_t, 
+                "Produksi (Ton)": produksi, 
+                "Sisa Stok (Ton)": stok_sisa
+            })
     return pd.DataFrame(hasil)
 
-# --- TAMPILAN UTAMA ---
-st.title("📊 Hasil Simulasi & Grafik")
+# --- TAMPILAN UTAMA (Tabel & Grafik Berdampingan) ---
+st.title("📈 Hasil Simulasi Alokasi Intertemporal")
 
 tab1, tab2, tab3 = st.tabs(["🏛️ Persaingan Sempurna", "🏢 Monopoli", "🏪 Oligopoli"])
 
@@ -88,18 +95,25 @@ for tab, label in zip([tab1, tab2, tab3], ["Persaingan", "Monopoli", "Oligopoli"
     with tab:
         df_res = jalankan_simulasi(label)
         
-        col_tab1, col_tab2 = st.columns([1, 1])
-        with col_tab1:
-            st.write("**Tabel Data:**")
-            st.table(df_res.style.format({"MUC": "{:,.2f}", "Produksi": "{:,.2f}", "Sisa_Stok": "{:,.2f}"}))
-        
-        with col_tab2:
-            st.write("**Grafik Produksi per Tahun:**")
-            st.line_chart(df_res.set_index("Tahun")["Produksi"])
+        if not df_res.empty:
+            col_tabel, col_grafik = st.columns([1, 1])
             
-            st.write("**Grafik MUC (Scarcity Rent):**")
-            st.area_chart(df_res.set_index("Tahun")["MUC"])
+            with col_tabel:
+                st.write(f"**Tabel Simulasi {label}:**")
+                st.table(df_res.style.format({
+                    "MUC": "{:,.2f}", 
+                    "Produksi (Ton)": "{:,.2f}", 
+                    "Sisa Stok (Ton)": "{:,.2f}"
+                }))
+            
+            with col_grafik:
+                st.write(f"**Grafik Produksi {label}:**")
+                st.line_chart(df_res.set_index("Tahun")["Produksi (Ton)"])
+                st.write(f"**Grafik Kelangkaan (MUC):**")
+                st.area_chart(df_res.set_index("Tahun")["MUC"])
+        else:
+            st.warning("Data tidak tersedia untuk parameter ini.")
 
 st.divider()
-st.subheader("💡 Analisis Ringkas")
-st.info(f"Grafik di atas menunjukkan bahwa dengan r={r*100:.0f}%, produksi cenderung menurun seiring waktu sementara MUC (biaya kelangkaan) meningkat mengikuti Aturan Hotelling.")
+st.subheader("💡 Analisis Ekonomi")
+st.info(f"Berdasarkan Aturan Hotelling, MUC akan meningkat sebesar tingkat diskonto ({r*100:.0f}%) per tahun sebagai refleksi dari nilai kelangkaan sumber daya nikel.")
