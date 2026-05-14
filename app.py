@@ -3,38 +3,38 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-# ======================================
-# PAGE CONFIG
-# ======================================
+# =====================================
+# CONFIG
+# =====================================
 
 st.set_page_config(
-    page_title="Ekonomi SDA - Nikel",
+    page_title="Ekonomi SDA Nikel",
     layout="wide"
 )
 
-# ======================================
-# JUDUL
-# ======================================
+# =====================================
+# TITLE
+# =====================================
 
 st.title("⛏️ Analisis Ekonomi SDA: Nikel")
 
 st.write("""
 Dashboard analisis ekonomi sumber daya alam dan lingkungan
-untuk melihat perkembangan harga dan stok nikel
-menggunakan pendekatan Hotelling Rule.
+menggunakan data produksi, harga nikel,
+dan simulasi Hotelling Rule.
 """)
 
-# ======================================
+# =====================================
 # SIDEBAR
-# ======================================
+# =====================================
 
 st.sidebar.title("⚙️ Kontrol Simulasi")
 
 harga_awal = st.sidebar.slider(
-    "Harga Nikel Awal ($)",
-    40.0,
-    150.0,
-    80.0
+    "Harga Nikel Awal",
+    100000,
+    300000,
+    150000
 )
 
 diskonto = st.sidebar.slider(
@@ -45,63 +45,56 @@ diskonto = st.sidebar.slider(
 )
 
 muc_awal = st.sidebar.slider(
-    "MUC Awal (λ0)",
-    0.0,
-    100.0,
-    20.0
+    "MUC Awal",
+    10000,
+    50000,
+    20000
 )
 
-pajak_karbon = st.sidebar.slider(
-    "Pajak Karbon Future ($)",
-    0.0,
-    200.0,
-    50.0
-)
-
-# ======================================
+# =====================================
 # DATA
-# ======================================
+# =====================================
 
 data = pd.read_csv("data_nikel.csv")
 
-# ======================================
+# =====================================
 # METRIC
-# ======================================
+# =====================================
 
 col1, col2, col3 = st.columns(3)
 
 with col1:
     st.metric(
-        "Harga Terakhir",
-        f"${data['Harga_Nikel'].iloc[-1]}"
+        "Harga Nikel 2023",
+        f"Rp {data['Harga_Nikel'].iloc[-1]:,.0f}"
     )
 
 with col2:
     st.metric(
-        "Stock Terakhir",
-        f"{data['Stock_Nikel'].iloc[-1]}"
+        "Produksi 2023",
+        f"{data['Produksi_ton'].iloc[-1]:,.0f} ton"
     )
 
 with col3:
     st.metric(
-        "Diskonto",
-        f"{diskonto:.2f}"
+        "MC 2023",
+        f"Rp {data['MC'].iloc[-1]:,.0f}"
     )
 
-# ======================================
-# TABEL DATA
-# ======================================
+# =====================================
+# TABEL
+# =====================================
 
-st.subheader("📊 Tabel Data Historis Nikel")
+st.subheader("📊 Tabel Data Nikel")
 
 st.dataframe(
     data,
     use_container_width=True
 )
 
-# ======================================
+# =====================================
 # GRAFIK HARGA
-# ======================================
+# =====================================
 
 st.subheader("📈 Grafik Harga Nikel")
 
@@ -119,75 +112,63 @@ ax1.set_ylabel("Harga Nikel")
 
 st.pyplot(fig1)
 
-# ======================================
-# GRAFIK STOCK
-# ======================================
+# =====================================
+# GRAFIK PRODUKSI
+# =====================================
 
-st.subheader("📉 Grafik Stock Nikel")
+st.subheader("📉 Grafik Produksi Nikel")
 
 fig2, ax2 = plt.subplots(figsize=(10,5))
 
 ax2.plot(
     data["Tahun"],
-    data["Stock_Nikel"],
+    data["Produksi_ton"],
     marker='o',
     linewidth=3
 )
 
 ax2.set_xlabel("Tahun")
-ax2.set_ylabel("Stock Nikel")
+ax2.set_ylabel("Produksi (ton)")
 
 st.pyplot(fig2)
 
-# ======================================
-# KURVA HOTELLING
-# ======================================
+# =====================================
+# HOTELLING
+# =====================================
 
 st.subheader("📌 Kurva Hotelling Rule")
 
-tahun_simulasi = np.arange(0, 15)
+tahun = np.arange(0, 15)
 
 harga_simulasi = (
-    harga_awal * np.exp(diskonto * tahun_simulasi)
-) + muc_awal + pajak_karbon
+    harga_awal * np.exp(diskonto * tahun)
+) + muc_awal
 
 fig3, ax3 = plt.subplots(figsize=(10,5))
 
 ax3.plot(
-    tahun_simulasi,
+    tahun,
     harga_simulasi,
     marker='o',
     linewidth=3
 )
 
 ax3.set_xlabel("Tahun")
-ax3.set_ylabel("Prediksi Harga Nikel")
+ax3.set_ylabel("Prediksi Harga")
 
 st.pyplot(fig3)
 
-# ======================================
+# =====================================
 # ANALISIS
-# ======================================
+# =====================================
 
 st.subheader("📖 Analisis")
 
-st.write(f"""
-Dengan harga awal sebesar ${harga_awal},
-tingkat diskonto {diskonto:.2f},
-MUC awal sebesar {muc_awal},
-dan pajak karbon sebesar ${pajak_karbon},
-maka harga nikel diproyeksikan meningkat
-seiring waktu mengikuti teori Hotelling Rule.
-""")
-
-# ======================================
-# KESIMPULAN
-# ======================================
-
-st.subheader("✅ Kesimpulan")
-
-st.success("""
-Semakin tinggi tingkat diskonto dan pajak karbon,
-maka harga sumber daya nikel di masa depan
-akan meningkat lebih cepat.
+st.write("""
+Grafik menunjukkan bahwa harga nikel
+cenderung meningkat dalam jangka panjang,
+sementara produksi mengalami fluktuasi.
+Simulasi Hotelling menunjukkan bahwa
+harga sumber daya akan meningkat seiring waktu
+karena kelangkaan sumber daya alam.
 """)
