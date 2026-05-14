@@ -3,18 +3,18 @@ import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
 
-# =========================================
+# ====================================
 # CONFIG
-# =========================================
+# ====================================
 
 st.set_page_config(
     page_title="Analisis Intertemporal Nikel",
     layout="wide"
 )
 
-# =========================================
-# CUSTOM CSS
-# =========================================
+# ====================================
+# CSS
+# ====================================
 
 st.markdown("""
 <style>
@@ -24,20 +24,16 @@ st.markdown("""
     color: white;
 }
 
-h1, h2, h3, h4 {
-    color: white;
-}
-
 [data-testid="stSidebar"] {
     background-color: #1e1e2f;
 }
 
-.block-container {
-    padding-top: 2rem;
+h1,h2,h3,h4 {
+    color: white;
 }
 
 .metric-card {
-    background-color: #1e3a5f;
+    background-color: #17375e;
     padding: 20px;
     border-radius: 15px;
     text-align: center;
@@ -49,19 +45,15 @@ h1, h2, h3, h4 {
     padding: 25px;
     border-radius: 20px;
     color: white;
+    margin-bottom: 30px;
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-# =========================================
+# ====================================
 # SIDEBAR
-# =========================================
-
-st.sidebar.image(
-    "https://upload.wikimedia.org/wikipedia/id/thumb/5/55/Logo_Unisba.svg/1200px-Logo_Unisba.svg.png",
-    width=120
-)
+# ====================================
 
 st.sidebar.title("⚙️ Kontrol Simulasi")
 
@@ -87,57 +79,67 @@ muc_awal = st.sidebar.slider(
 )
 
 pajak = st.sidebar.slider(
-    "Pajak Karbon Future",
+    "Pajak Karbon Future ($)",
     0,
     100,
     20
 )
 
-# =========================================
+# ====================================
 # DATA
-# =========================================
+# ====================================
 
 data = pd.read_csv("data_nikel.csv")
 
-# =========================================
+# ====================================
 # HEADER
-# =========================================
+# ====================================
 
-col1, col2 = st.columns([1,5])
+st.title("Analisis Intertemporal Sumber Daya Nikel")
 
-with col1:
-    st.image(
-        "https://upload.wikimedia.org/wikipedia/id/thumb/5/55/Logo_Unisba.svg/1200px-Logo_Unisba.svg.png",
-        width=150
-    )
+st.subheader("Ekonomi SDA dan Lingkungan")
 
-with col2:
-    st.title("Analisis Intertemporal Sumber Daya Nikel")
-    st.subheader("Ekonomi Sumber Daya Alam dan Lingkungan")
-
-# =========================================
+# ====================================
 # INFO BOX
-# =========================================
+# ====================================
 
 st.markdown("""
 <div class="info-box">
 
-### ANGGOTA KELOMPOK
+<h2>KELOMPOK : 2</h2>
 
-1. Nama Anggota 1  
-2. Nama Anggota 2  
-3. Nama Anggota 3  
+<h3>ANGGOTA</h3>
 
-### DOSEN PENGAMPU
+<p style="font-size:20px;">
+1. Radea Rahman Dwiyana (10090224001)<br><br>
 
-Nama Dosen
+2. Bunga Wiati Manaki (10090224026)<br><br>
+
+3. Shidqi Alhamdani Mieftah (10090224032)
+</p>
+
+<hr>
+
+<h3>DOSEN</h3>
+
+<p style="font-size:20px;">
+Yuhka Sundaya, S.E., M.Si.
+</p>
+
+<hr>
+
+<h3>MATA KULIAH</h3>
+
+<p style="font-size:20px;">
+Ekonomi SDA dan Lingkungan
+</p>
 
 </div>
 """, unsafe_allow_html=True)
 
-# =========================================
+# ====================================
 # PARAMETER
-# =========================================
+# ====================================
 
 st.subheader("📌 Parameter Dasar Analisis")
 
@@ -146,8 +148,8 @@ c1, c2, c3, c4 = st.columns(4)
 with c1:
     st.markdown(f"""
     <div class="metric-card">
-    <h3>Harga 2023</h3>
-    <h2>Rp {data['Harga_Nikel'].iloc[-1]:,.0f}</h2>
+    <h3>Harga 2024</h3>
+    <h2>{data['Harga'].iloc[-1]:,.0f}</h2>
     </div>
     """, unsafe_allow_html=True)
 
@@ -155,7 +157,7 @@ with c2:
     st.markdown(f"""
     <div class="metric-card">
     <h3>Produksi</h3>
-    <h2>{data['Produksi_ton'].iloc[-1]:,.0f}</h2>
+    <h2>{data['Produksi'].iloc[-1]:,.0f}</h2>
     </div>
     """, unsafe_allow_html=True)
 
@@ -163,7 +165,7 @@ with c3:
     st.markdown(f"""
     <div class="metric-card">
     <h3>MC</h3>
-    <h2>{data['MC'].iloc[-1]:,.0f}</h2>
+    <h2>{data['mc'].iloc[-1]:,.0f}</h2>
     </div>
     """, unsafe_allow_html=True)
 
@@ -175,21 +177,21 @@ with c4:
     </div>
     """, unsafe_allow_html=True)
 
-# =========================================
+# ====================================
 # TABEL
-# =========================================
+# ====================================
 
-st.subheader("📊 Tabel Data Nikel")
+st.subheader("📊 Data Historis Produksi & Harga")
 
 st.dataframe(data, use_container_width=True)
 
-# =========================================
+# ====================================
 # GRAFIK
-# =========================================
+# ====================================
 
-colA, colB = st.columns(2)
+col1, col2 = st.columns(2)
 
-with colA:
+with col1:
 
     st.subheader("📈 Grafik Harga Nikel")
 
@@ -197,49 +199,54 @@ with colA:
 
     ax1.plot(
         data["Tahun"],
-        data["Harga_Nikel"],
+        data["Harga"],
         marker='o',
         linewidth=3
     )
 
-    ax1.set_facecolor("#0f172a")
-
     st.pyplot(fig1)
 
-with colB:
+with col2:
 
-    st.subheader("📉 Grafik Produksi")
+    st.subheader("📉 Grafik Produksi Nikel")
 
     fig2, ax2 = plt.subplots(figsize=(7,4))
 
     ax2.plot(
         data["Tahun"],
-        data["Produksi_ton"],
+        data["Produksi"],
         marker='o',
         linewidth=3
     )
 
-    ax2.set_facecolor("#0f172a")
-
     st.pyplot(fig2)
 
-# =========================================
-# HOTELLING
-# =========================================
+# ====================================
+# SIMULASI
+# ====================================
 
 st.subheader("📌 Simulasi Hotelling Rule")
 
-tahun = np.arange(0, 15)
+tahun = np.arange(2014, 2025)
 
 harga = (
-    harga_awal * np.exp(diskonto * tahun)
+    harga_awal *
+    np.exp(
+        diskonto * np.arange(len(tahun))
+    )
 ) + muc_awal + pajak
 
-stock = 20000 - (tahun * 900)
+stock = np.linspace(20000, 10000, len(tahun))
 
-colC, colD = st.columns(2)
+# ====================================
+# KURVA
+# ====================================
 
-with colC:
+col3, col4 = st.columns(2)
+
+with col3:
+
+    st.subheader("📈 Kurva Harga Hotelling")
 
     fig3, ax3 = plt.subplots(figsize=(7,4))
 
@@ -250,11 +257,11 @@ with colC:
         linewidth=3
     )
 
-    ax3.set_title("Kurva Harga Hotelling")
-
     st.pyplot(fig3)
 
-with colD:
+with col4:
+
+    st.subheader("📉 Kurva Sisa Cadangan")
 
     fig4, ax4 = plt.subplots(figsize=(7,4))
 
@@ -265,13 +272,11 @@ with colD:
         linewidth=3
     )
 
-    ax4.set_title("Kurva Sisa Cadangan")
-
     st.pyplot(fig4)
 
-# =========================================
-# HASIL
-# =========================================
+# ====================================
+# HASIL SIMULASI
+# ====================================
 
 st.subheader("📖 Hasil Simulasi")
 
