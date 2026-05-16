@@ -1,284 +1,136 @@
-```python
 import streamlit as st
 import pandas as pd
-import numpy as np
 import plotly.express as px
 
 # =========================
-# KONFIGURASI HALAMAN
+# CONFIG
 # =========================
 st.set_page_config(
-    page_title="Dashboard Simulasi Ekonomi Nikel",
+    page_title="Simulasi Ekonomi Nikel",
     layout="wide",
-    page_icon="📊"
+    page_icon="⛏️"
 )
 
 # =========================
-# CUSTOM CSS
+# CSS CERAH
 # =========================
 st.markdown("""
 <style>
-.main {
+body {
     background-color: #f4f7fb;
 }
 
 .block-container {
-    padding-top: 2rem;
+    padding: 2rem 2rem;
 }
 
 h1, h2, h3 {
-    color: #1d3557;
+    color: #1f4e79;
 }
 
 [data-testid="stMetric"] {
     background-color: white;
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0px 3px 10px rgba(0,0,0,0.08);
-    text-align: center;
-}
-
-.sidebar .sidebar-content {
-    background-color: white;
+    padding: 15px;
+    border-radius: 12px;
+    box-shadow: 0px 2px 10px rgba(0,0,0,0.08);
 }
 </style>
 """, unsafe_allow_html=True)
 
 # =========================
-# HEADER
+# TITLE
 # =========================
-st.title("📈 Dashboard Simulasi Ekonomi Nikel")
-
-st.markdown("""
-Dashboard ini digunakan untuk mensimulasikan pengaruh struktur pasar terhadap eksploitasi sumber daya nikel.  
-Simulasi mempertimbangkan:
-- Harga Nikel
-- Tingkat Diskonto
-- Green Taxes
-- Struktur Pasar
-""")
+st.title("📊 Dashboard Simulasi Ekonomi Nikel")
+st.write("Simulasi struktur pasar: Persaingan Sempurna, Monopoli, dan Oligopoli")
 
 # =========================
-# SIDEBAR
+# SIDEBAR INPUT
 # =========================
-st.sidebar.header("⚙️ Pengaturan Simulasi")
+st.sidebar.header("⚙️ Parameter Simulasi")
 
 market = st.sidebar.selectbox(
     "Struktur Pasar",
-    [
-        "Persaingan Sempurna",
-        "Monopoli",
-        "Oligopoli"
-    ]
+    ["Persaingan Sempurna", "Monopoli", "Oligopoli"]
 )
 
-price = st.sidebar.slider(
-    "Harga Nikel",
-    50,
-    500,
-    200
-)
+price = st.sidebar.slider("Harga Nikel", 50, 500, 200)
+discount = st.sidebar.slider("Tingkat Diskonto (%)", 1, 20, 5)
+green_tax = st.sidebar.slider("Green Taxes (%)", 0, 50, 10)
 
-discount = st.sidebar.slider(
-    "Tingkat Diskonto (%)",
-    1,
-    20,
-    5
-)
-
-green_tax = st.sidebar.slider(
-    "Green Taxes (%)",
-    0,
-    50,
-    10
-)
-
-initial_stock = st.sidebar.number_input(
-    "Cadangan Awal",
-    min_value=1000,
-    max_value=1000000,
-    value=10000,
-    step=1000
-)
-
-years = st.sidebar.slider(
-    "Periode Simulasi",
-    5,
-    50,
-    20
-)
+stock0 = st.sidebar.number_input("Stok Awal", 1000, 100000, 10000)
+years = st.sidebar.slider("Periode (Tahun)", 5, 50, 20)
 
 # =========================
-# LOGIKA EKONOMI
+# MODEL PASAR
 # =========================
-base_production = 500
-
 if market == "Persaingan Sempurna":
-    market_factor = 1.3
+    factor = 1.3
 elif market == "Monopoli":
-    market_factor = 0.8
+    factor = 0.8
 else:
-    market_factor = 1.0
+    factor = 1.0
 
-production = (
-    base_production *
-    market_factor *
-    (price / 200) *
-    (1 - green_tax / 100) *
-    (1 - discount / 100)
-)
+production = 500 * factor * (price/200) * (1 - green_tax/100) * (1 - discount/100)
 
 # =========================
-# SIMULASI DATA
+# SIMULASI
 # =========================
-tahun = []
-stok = []
-produksi = []
+stock = stock0
+data = []
 
-remaining_stock = initial_stock
+for t in range(1, years + 1):
+    stock -= production
+    if stock < 0:
+        stock = 0
 
-for year in range(1, years + 1):
+    data.append([t, production, stock])
 
-    remaining_stock -= production
-
-    if remaining_stock < 0:
-        remaining_stock = 0
-
-    tahun.append(year)
-    stok.append(remaining_stock)
-    produksi.append(production)
-
-    if remaining_stock <= 0:
+    if stock == 0:
         break
 
-df = pd.DataFrame({
-    "Tahun": tahun,
-    "Produksi": produksi,
-    "Stok": stok
-})
+df = pd.DataFrame(data, columns=["Tahun", "Produksi", "Stok"])
 
 # =========================
-# METRICS
+# METRIC
 # =========================
-st.subheader("📌 Indikator Utama")
-
 col1, col2, col3 = st.columns(3)
 
-with col1:
-    st.metric(
-        "⛏️ Volume Produksi",
-        f"{production:,.0f} ton/tahun"
-    )
-
-with col2:
-    st.metric(
-        "📦 Sisa Stok",
-        f"{remaining_stock:,.0f} ton"
-    )
-
-with col3:
-    st.metric(
-        "⏳ Waktu Habis",
-        f"{len(df)} tahun"
-    )
+col1.metric("⛏️ Produksi/Tahun", f"{production:,.0f}")
+col2.metric("📦 Sisa Stok", f"{stock:,.0f}")
+col3.metric("⏳ Waktu Habis", f"{len(df)} tahun")
 
 # =========================
-# GRAFIK PRODUKSI
+# GRAFIK
 # =========================
-st.subheader("📊 Grafik Volume Produksi")
+st.subheader("📉 Grafik Stok")
+st.line_chart(df.set_index("Tahun")["Stok"])
 
-fig1 = px.area(
-    df,
-    x="Tahun",
-    y="Produksi",
-    title="Perkembangan Produksi Nikel"
-)
-
-st.plotly_chart(fig1, use_container_width=True)
+st.subheader("📊 Grafik Produksi")
+st.area_chart(df.set_index("Tahun")["Produksi"])
 
 # =========================
-# GRAFIK STOK
+# ANALISIS
 # =========================
-st.subheader("📉 Grafik Sisa Cadangan")
-
-fig2 = px.line(
-    df,
-    x="Tahun",
-    y="Stok",
-    title="Perubahan Stok Cadangan"
-)
-
-st.plotly_chart(fig2, use_container_width=True)
-
-# =========================
-# ANALISIS OTOMATIS
-# =========================
-st.subheader("🧠 Analisis Ekonomi")
-
-analisis = ""
+st.subheader("🧠 Analisis")
 
 if market == "Persaingan Sempurna":
-    analisis += """
-    Pada pasar persaingan sempurna, perusahaan cenderung meningkatkan produksi karena persaingan tinggi.
-    Harga memiliki pengaruh besar terhadap volume ekstraksi.
-    """
-
+    text = "Produksi tinggi karena kompetisi ketat antar produsen."
 elif market == "Monopoli":
-    analisis += """
-    Dalam struktur monopoli, produksi lebih terkendali karena pasar dikuasai satu perusahaan.
-    Eksploitasi sumber daya cenderung lebih lambat.
-    """
-
+    text = "Produksi lebih rendah karena dikontrol satu pelaku pasar."
 else:
-    analisis += """
-    Pada pasar oligopoli, produksi dipengaruhi oleh interaksi beberapa perusahaan besar.
-    Tingkat produksi berada di antara monopoli dan persaingan sempurna.
-    """
+    text = "Produksi berada di tingkat menengah karena ada beberapa perusahaan besar."
 
-if green_tax >= 20:
-    analisis += """
+if green_tax > 20:
+    text += " Green tax tinggi menurunkan produksi."
+if discount > 10:
+    text += " Diskonto tinggi mendorong eksploitasi cepat."
+if price > 300:
+    text += " Harga tinggi meningkatkan insentif produksi."
 
-    Green taxes yang tinggi menekan produksi dan memperpanjang umur cadangan sumber daya.
-    """
-
-if price >= 300:
-    analisis += """
-
-    Harga nikel yang tinggi meningkatkan insentif ekstraksi sehingga produksi meningkat.
-    """
-
-if discount >= 10:
-    analisis += """
-
-    Tingkat diskonto yang tinggi mendorong eksploitasi sumber daya dalam jangka pendek.
-    """
-
-st.info(analisis)
+st.info(text)
 
 # =========================
-# DATAFRAME
+# DATA
 # =========================
 st.subheader("📋 Data Simulasi")
-
-st.dataframe(
-    df,
-    use_container_width=True
-)
-
-# =========================
-# KESIMPULAN
-# =========================
-st.subheader("📚 Kesimpulan")
-
-st.success(f"""
-Struktur pasar {market.lower()} menghasilkan volume produksi sekitar {production:,.0f} ton per tahun.
-Dengan cadangan awal sebesar {initial_stock:,.0f} ton, sumber daya diperkirakan habis dalam {len(df)} tahun.
-""")
-
-# =========================
-# FOOTER
-# =========================
-st.markdown("---")
-
-st.caption("Dashboard Simulasi Ekonomi Nikel | Streamlit Project")
-```
+st.dataframe(df, use_container_width=True)
