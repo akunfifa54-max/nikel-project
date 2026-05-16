@@ -1,34 +1,41 @@
 import streamlit as st
 import pandas as pd
+import os
 
 # =========================
 # PAGE CONFIG
 # =========================
 st.set_page_config(
-    page_title="PBL SDA - Nikel PT Vale Indonesia",
+    page_title="PBL SDA - PT Vale Indonesia",
     layout="wide",
     page_icon="⛏️"
 )
 
 # =========================
-# LOGO + HEADER
+# LOGO SAFE LOAD (ANTI ERROR)
 # =========================
 col1, col2 = st.columns([1, 5])
 
 with col1:
-    st.image("logo_unisba.png", width=120)
+    if os.path.exists("logo_unisba.png"):
+        st.image("logo_unisba.png", width=120)
+    else:
+        st.warning("Logo UNISBA belum diupload ke GitHub")
 
 with col2:
-    st.title("📊 PBL Ekonomi SDA - Industri Nikel")
-    st.subheader("⛏️ PT Vale Indonesia (2014–2024 Data Real)")
+    st.title("📊 PBL Ekonomi Sumber Daya Alam")
+    st.subheader("⛏️ PT Vale Indonesia (2014–2024)")
 
+# =========================
+# IDENTITAS
+# =========================
 st.markdown("""
-**ANGGOTA KELOMPOK:**
+### 👥 Anggota Kelompok
 - Radea Rahman Dwiyana (10090224001)  
 - Bunga Wiati Manaki (10090224026)  
 - Shidqi Alhamdani Mieftah (10090224032)  
 
-**DOSEN PENGAMPU:**  
+### 🎓 Dosen Pengampu
 Yuhka Sundaya, S.E., M.Si.
 """)
 
@@ -58,28 +65,28 @@ col3.metric("📈 MC", f"{df['MC'].iloc[-1]:,}")
 # =========================
 # GRAFIK
 # =========================
-st.subheader("📈 Tren Produksi Nikel")
+st.subheader("📈 Tren Produksi")
 st.line_chart(df.set_index("Tahun")[["Produksi"]])
 
-st.subheader("💰 Tren Harga Nikel")
+st.subheader("💰 Tren Harga")
 st.line_chart(df.set_index("Tahun")[["Harga"]])
 
-st.subheader("📊 Tren Marginal Cost (MC)")
+st.subheader("📊 Tren MC (Marginal Cost)")
 st.line_chart(df.set_index("Tahun")[["MC"]])
 
 # =========================
-# ANALISIS
+# INSIGHT
 # =========================
 st.subheader("🧠 Analisis Ekonomi")
 
 st.info("""
 Data menunjukkan dinamika industri nikel Indonesia:
 
-- Produksi relatif fluktuatif dengan kecenderungan menurun pada periode tertentu.
-- Harga nikel meningkat signifikan hingga 2022 akibat permintaan global.
-- MC (biaya marginal) terus meningkat yang menunjukkan semakin mahalnya ekstraksi sumber daya.
+• Produksi cenderung fluktuatif namun relatif menurun pada periode tertentu  
+• Harga nikel meningkat signifikan hingga 2022 karena permintaan global  
+• MC terus meningkat → biaya ekstraksi semakin mahal  
 
-Kesimpulan:
+KESIMPULAN:
 Industri nikel menunjukkan karakteristik sumber daya alam yang semakin langka dan biaya ekstraksi meningkat dari tahun ke tahun.
 """)
 
@@ -93,4 +100,4 @@ st.dataframe(df, use_container_width=True)
 # FOOTER
 # =========================
 st.markdown("---")
-st.caption("PT Vale Indonesia | PBL Ekonomi SDA | Universitas Islam Bandung (UNISBA)")
+st.caption("PBL Ekonomi SDA | PT Vale Indonesia | Universitas Islam Bandung")
