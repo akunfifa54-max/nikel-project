@@ -1,6 +1,5 @@
 import streamlit as st
 import pandas as pd
-import plotly.express as px
 
 # =========================
 # CONFIG
@@ -21,7 +20,7 @@ body {
 }
 
 .block-container {
-    padding: 2rem 2rem;
+    padding: 2rem;
 }
 
 h1, h2, h3 {
@@ -41,12 +40,12 @@ h1, h2, h3 {
 # TITLE
 # =========================
 st.title("📊 Dashboard Simulasi Ekonomi Nikel")
-st.write("Simulasi struktur pasar: Persaingan Sempurna, Monopoli, dan Oligopoli")
+st.write("Simulasi: Persaingan Sempurna, Monopoli, Oligopoli")
 
 # =========================
-# SIDEBAR INPUT
+# SIDEBAR
 # =========================
-st.sidebar.header("⚙️ Parameter Simulasi")
+st.sidebar.header("⚙️ Parameter")
 
 market = st.sidebar.selectbox(
     "Struktur Pasar",
@@ -54,11 +53,11 @@ market = st.sidebar.selectbox(
 )
 
 price = st.sidebar.slider("Harga Nikel", 50, 500, 200)
-discount = st.sidebar.slider("Tingkat Diskonto (%)", 1, 20, 5)
-green_tax = st.sidebar.slider("Green Taxes (%)", 0, 50, 10)
+discount = st.sidebar.slider("Diskonto (%)", 1, 20, 5)
+green_tax = st.sidebar.slider("Green Tax (%)", 0, 50, 10)
 
 stock0 = st.sidebar.number_input("Stok Awal", 1000, 100000, 10000)
-years = st.sidebar.slider("Periode (Tahun)", 5, 50, 20)
+years = st.sidebar.slider("Tahun Simulasi", 5, 50, 20)
 
 # =========================
 # MODEL PASAR
@@ -100,7 +99,7 @@ col2.metric("📦 Sisa Stok", f"{stock:,.0f}")
 col3.metric("⏳ Waktu Habis", f"{len(df)} tahun")
 
 # =========================
-# GRAFIK
+# GRAFIK (STREAMLIT NATIF)
 # =========================
 st.subheader("📉 Grafik Stok")
 st.line_chart(df.set_index("Tahun")["Stok"])
@@ -111,21 +110,23 @@ st.area_chart(df.set_index("Tahun")["Produksi"])
 # =========================
 # ANALISIS
 # =========================
-st.subheader("🧠 Analisis")
+st.subheader("🧠 Analisis Ekonomi")
+
+text = ""
 
 if market == "Persaingan Sempurna":
-    text = "Produksi tinggi karena kompetisi ketat antar produsen."
+    text = "Persaingan tinggi → produksi lebih agresif dan cepat mengurangi stok."
 elif market == "Monopoli":
-    text = "Produksi lebih rendah karena dikontrol satu pelaku pasar."
+    text = "Monopoli → produksi lebih terkontrol sehingga stok lebih awet."
 else:
-    text = "Produksi berada di tingkat menengah karena ada beberapa perusahaan besar."
+    text = "Oligopoli → produksi berada di tingkat moderat karena ada beberapa pemain besar."
 
 if green_tax > 20:
-    text += " Green tax tinggi menurunkan produksi."
+    text += " Green tax tinggi menekan produksi."
 if discount > 10:
-    text += " Diskonto tinggi mendorong eksploitasi cepat."
+    text += " Diskonto tinggi mempercepat eksploitasi."
 if price > 300:
-    text += " Harga tinggi meningkatkan insentif produksi."
+    text += " Harga tinggi meningkatkan produksi."
 
 st.info(text)
 
@@ -134,3 +135,9 @@ st.info(text)
 # =========================
 st.subheader("📋 Data Simulasi")
 st.dataframe(df, use_container_width=True)
+
+# =========================
+# FOOTER
+# =========================
+st.markdown("---")
+st.caption("Dashboard Simulasi Ekonomi Nikel")
