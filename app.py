@@ -134,3 +134,19 @@ st.dataframe(df_sim, use_container_width=True)
 # =========================
 st.markdown("---")
 st.caption("PBL SDA | PT Vale Indonesia | UNISBA")
+# =========================
+# KESIMPULAN
+# =========================
+st.subheader("📌 Kesimpulan")
+
+st.markdown("""
+Dari hasil analisis data industri nikel PT Vale Indonesia periode 2014–2024, dapat disimpulkan bahwa:
+
+- Produksi nikel mengalami fluktuasi dengan kecenderungan penurunan pada beberapa periode, yang menunjukkan adanya tekanan pada sisi produksi dan efisiensi sumber daya.
+- Harga nikel menunjukkan tren peningkatan signifikan hingga tahun 2022, yang mencerminkan meningkatnya permintaan global terhadap nikel sebagai bahan baku industri baterai dan energi.
+- Biaya marginal (MC) terus meningkat dari tahun ke tahun, yang mengindikasikan bahwa biaya ekstraksi sumber daya semakin mahal akibat menurunnya kualitas atau ketersediaan cadangan.
+
+Secara keseluruhan, industri nikel menunjukkan karakteristik sumber daya alam yang semakin langka (scarcity resource), di mana peningkatan harga tidak selalu diikuti oleh peningkatan produksi secara proporsional.
+
+Hal ini menegaskan pentingnya pengelolaan sumber daya yang efisien, kebijakan lingkungan seperti green tax, serta strategi produksi yang mempertimbangkan keberlanjutan jangka panjang.
+""")
