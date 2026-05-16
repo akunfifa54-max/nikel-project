@@ -1,9 +1,7 @@
 import streamlit as st
 import pandas as pd
+import streamlit as st
 
-# =========================
-# PAGE CONFIG
-# =========================
 st.set_page_config(
     page_title="PBL SDA - Nikel PT Vale Indonesia",
     layout="wide",
@@ -20,8 +18,9 @@ with col2:
     st.title("📊 PBL Ekonomi SDA - Industri Nikel")
     st.subheader("⛏️ PT Vale Indonesia")
 # =========================
-# CSS CLEAN
+# PAGE CONFIG
 # =========================
+
 st.markdown("""
 <style>
 body {
