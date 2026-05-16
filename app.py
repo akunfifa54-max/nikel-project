@@ -5,7 +5,7 @@ import pandas as pd
 # CONFIG
 # =========================
 st.set_page_config(
-    page_title="Simulasi Ekonomi Nikel",
+    page_title="PT Vale Indonesia - Simulasi Ekonomi Nikel",
     layout="wide",
     page_icon="⛏️"
 )
@@ -23,7 +23,12 @@ body {
     padding: 2rem;
 }
 
-h1, h2, h3 {
+h1 {
+    color: #1f4e79;
+    text-align: center;
+}
+
+h3 {
     color: #1f4e79;
 }
 
@@ -37,15 +42,27 @@ h1, h2, h3 {
 """, unsafe_allow_html=True)
 
 # =========================
-# TITLE
+# HEADER
 # =========================
-st.title("📊 Dashboard Simulasi Ekonomi Nikel")
-st.write("Simulasi: Persaingan Sempurna, Monopoli, Oligopoli")
+st.title("⛏️ PT Vale Indonesia")
+st.subheader("📊 Dashboard Simulasi Ekonomi Nikel")
+
+st.markdown("""
+### 👥 Anggota Kelompok
+1. Radea Rahman Dwiyana (10090224001)  
+2. Bunga Wiati Manaki (10090224026)  
+3. Shidqi Alhamdani Mieftah (10090224032)  
+
+### 🎓 Dosen Pengampu
+Yuhka Sundaya, S.E., M.Si.
+""")
+
+st.divider()
 
 # =========================
-# SIDEBAR
+# SIDEBAR INPUT
 # =========================
-st.sidebar.header("⚙️ Parameter")
+st.sidebar.header("⚙️ Parameter Simulasi")
 
 market = st.sidebar.selectbox(
     "Struktur Pasar",
@@ -53,14 +70,14 @@ market = st.sidebar.selectbox(
 )
 
 price = st.sidebar.slider("Harga Nikel", 50, 500, 200)
-discount = st.sidebar.slider("Diskonto (%)", 1, 20, 5)
+discount = st.sidebar.slider("Tingkat Diskonto (%)", 1, 20, 5)
 green_tax = st.sidebar.slider("Green Tax (%)", 0, 50, 10)
 
-stock0 = st.sidebar.number_input("Stok Awal", 1000, 100000, 10000)
-years = st.sidebar.slider("Tahun Simulasi", 5, 50, 20)
+stock0 = st.sidebar.number_input("Stok Awal (ton)", 1000, 100000, 10000)
+years = st.sidebar.slider("Periode Simulasi (tahun)", 5, 50, 20)
 
 # =========================
-# MODEL PASAR
+# MODEL STRUKTUR PASAR
 # =========================
 if market == "Persaingan Sempurna":
     factor = 1.3
@@ -69,7 +86,7 @@ elif market == "Monopoli":
 else:
     factor = 1.0
 
-production = 500 * factor * (price/200) * (1 - green_tax/100) * (1 - discount/100)
+production = 500 * factor * (price / 200) * (1 - green_tax / 100) * (1 - discount / 100)
 
 # =========================
 # SIMULASI
@@ -94,32 +111,30 @@ df = pd.DataFrame(data, columns=["Tahun", "Produksi", "Stok"])
 # =========================
 col1, col2, col3 = st.columns(3)
 
-col1.metric("⛏️ Produksi/Tahun", f"{production:,.0f}")
-col2.metric("📦 Sisa Stok", f"{stock:,.0f}")
+col1.metric("⛏️ Produksi/Tahun", f"{production:,.0f} ton")
+col2.metric("📦 Sisa Stok", f"{stock:,.0f} ton")
 col3.metric("⏳ Waktu Habis", f"{len(df)} tahun")
 
 # =========================
-# GRAFIK (STREAMLIT NATIF)
+# GRAFIK (BIRU)
 # =========================
-st.subheader("📉 Grafik Stok")
-st.line_chart(df.set_index("Tahun")["Stok"])
+st.subheader("📉 Tren Stok Nikel")
+st.line_chart(df.set_index("Tahun")[["Stok"]], height=350)
 
-st.subheader("📊 Grafik Produksi")
-st.area_chart(df.set_index("Tahun")["Produksi"])
+st.subheader("📊 Tren Produksi Nikel")
+st.area_chart(df.set_index("Tahun")[["Produksi"]], height=350)
 
 # =========================
 # ANALISIS
 # =========================
 st.subheader("🧠 Analisis Ekonomi")
 
-text = ""
-
 if market == "Persaingan Sempurna":
-    text = "Persaingan tinggi → produksi lebih agresif dan cepat mengurangi stok."
+    text = "Pasar kompetitif → produksi tinggi dan stok cepat habis."
 elif market == "Monopoli":
-    text = "Monopoli → produksi lebih terkontrol sehingga stok lebih awet."
+    text = "Monopoli → produksi lebih rendah dan sumber daya lebih awet."
 else:
-    text = "Oligopoli → produksi berada di tingkat moderat karena ada beberapa pemain besar."
+    text = "Oligopoli → produksi berada di tingkat menengah."
 
 if green_tax > 20:
     text += " Green tax tinggi menekan produksi."
@@ -140,4 +155,4 @@ st.dataframe(df, use_container_width=True)
 # FOOTER
 # =========================
 st.markdown("---")
-st.caption("Dashboard Simulasi Ekonomi Nikel")
+st.caption("© PT Vale Indonesia - Simulasi Ekonomi Nikel")
