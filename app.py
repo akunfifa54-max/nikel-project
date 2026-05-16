@@ -1,26 +1,18 @@
 import streamlit as st
 import pandas as pd
-import streamlit as st
 
+# =========================
+# PAGE CONFIG
+# =========================
 st.set_page_config(
     page_title="PBL SDA - Nikel PT Vale Indonesia",
     layout="wide",
     page_icon="⛏️"
 )
 
-# LOGO UNISBA + HEADER
-col1, col2 = st.columns([1, 5])
-
-with col1:
-    st.image("logo_unisba.png", width=120)
-
-with col2:
-    st.title("📊 PBL Ekonomi SDA - Industri Nikel")
-    st.subheader("⛏️ PT Vale Indonesia")
 # =========================
-# PAGE CONFIG
+# CSS CLEAN
 # =========================
-
 st.markdown("""
 <style>
 body {
