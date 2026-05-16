@@ -11,36 +11,16 @@ st.set_page_config(
 )
 
 # =========================
-# CSS CLEAN
+# LOGO + HEADER
 # =========================
-st.markdown("""
-<style>
-body {
-    background-color: #f4f7fb;
-}
+col1, col2 = st.columns([1, 5])
 
-.block-container {
-    padding: 2rem 2.5rem;
-}
+with col1:
+    st.image("logo_unisba.png", width=120)
 
-h1, h2, h3 {
-    color: #0b3d91;
-}
-
-[data-testid="stMetric"] {
-    background-color: white;
-    padding: 16px;
-    border-radius: 12px;
-    box-shadow: 0px 2px 10px rgba(0,0,0,0.08);
-}
-</style>
-""", unsafe_allow_html=True)
-
-# =========================
-# HEADER
-# =========================
-st.title("📊 PBL Ekonomi SDA - Industri Nikel")
-st.subheader("⛏️ PT Vale Indonesia (Data Real 2014–2024)")
+with col2:
+    st.title("📊 PBL Ekonomi SDA - Industri Nikel")
+    st.subheader("⛏️ PT Vale Indonesia (2014–2024 Data Real)")
 
 st.markdown("""
 **ANGGOTA KELOMPOK:**
@@ -55,7 +35,7 @@ Yuhka Sundaya, S.E., M.Si.
 st.divider()
 
 # =========================
-# DATA ASLI
+# DATA REAL KAMU
 # =========================
 df = pd.DataFrame({
     "Tahun": [2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024],
@@ -65,13 +45,7 @@ df = pd.DataFrame({
 })
 
 # =========================
-# SIDEBAR INFO
-# =========================
-st.sidebar.header("📌 Informasi Data")
-st.sidebar.write("Data real industri nikel Indonesia (2014–2024)")
-
-# =========================
-# KPI
+# KPI (2024)
 # =========================
 st.subheader("📌 Key Indicators (2024)")
 
@@ -98,18 +72,16 @@ st.line_chart(df.set_index("Tahun")[["MC"]])
 # =========================
 st.subheader("🧠 Analisis Ekonomi")
 
-analysis = """
-Data menunjukkan hubungan penting antara produksi, harga, dan biaya marginal (MC).
+st.info("""
+Data menunjukkan dinamika industri nikel Indonesia:
 
-- Produksi cenderung menurun dari 2014 ke 2022 akibat peningkatan biaya dan dinamika pasar.
-- Harga nikel meningkat signifikan hingga 2022 karena permintaan global.
-- MC terus meningkat menunjukkan biaya ekstraksi semakin mahal (indikasi kelangkaan sumber daya).
+- Produksi relatif fluktuatif dengan kecenderungan menurun pada periode tertentu.
+- Harga nikel meningkat signifikan hingga 2022 akibat permintaan global.
+- MC (biaya marginal) terus meningkat yang menunjukkan semakin mahalnya ekstraksi sumber daya.
 
 Kesimpulan:
-Industri nikel menunjukkan karakteristik sumber daya alam yang semakin langka dan mahal untuk dieksploitasi.
-"""
-
-st.info(analysis)
+Industri nikel menunjukkan karakteristik sumber daya alam yang semakin langka dan biaya ekstraksi meningkat dari tahun ke tahun.
+""")
 
 # =========================
 # DATA TABLE
@@ -121,4 +93,4 @@ st.dataframe(df, use_container_width=True)
 # FOOTER
 # =========================
 st.markdown("---")
-st.caption("PT Vale Indonesia | PBL Ekonomi SDA")
+st.caption("PT Vale Indonesia | PBL Ekonomi SDA | Universitas Islam Bandung (UNISBA)")
