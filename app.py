@@ -5,7 +5,7 @@ import pandas as pd
 # CONFIG
 # =========================
 st.set_page_config(
-    page_title="PT Vale Indonesia - Simulasi Ekonomi Nikel",
+    page_title="PT Vale Indonesia - Simulasi Nikel",
     layout="wide",
     page_icon="⛏️"
 )
@@ -28,10 +28,6 @@ h1 {
     text-align: center;
 }
 
-h3 {
-    color: #1f4e79;
-}
-
 [data-testid="stMetric"] {
     background-color: white;
     padding: 15px;
@@ -45,7 +41,7 @@ h3 {
 # HEADER
 # =========================
 st.title("⛏️ PT Vale Indonesia")
-st.subheader("📊 Dashboard Simulasi Ekonomi Nikel")
+st.subheader("📊 Dashboard Simulasi Ekonomi Nikel (2014–2024)")
 
 st.markdown("""
 ### 👥 Anggota Kelompok
@@ -60,9 +56,9 @@ Yuhka Sundaya, S.E., M.Si.
 st.divider()
 
 # =========================
-# SIDEBAR INPUT
+# SIDEBAR
 # =========================
-st.sidebar.header("⚙️ Parameter Simulasi")
+st.sidebar.header("⚙️ Parameter")
 
 market = st.sidebar.selectbox(
     "Struktur Pasar",
@@ -70,14 +66,18 @@ market = st.sidebar.selectbox(
 )
 
 price = st.sidebar.slider("Harga Nikel", 50, 500, 200)
-discount = st.sidebar.slider("Tingkat Diskonto (%)", 1, 20, 5)
+discount = st.sidebar.slider("Diskonto (%)", 1, 20, 5)
 green_tax = st.sidebar.slider("Green Tax (%)", 0, 50, 10)
 
 stock0 = st.sidebar.number_input("Stok Awal (ton)", 1000, 100000, 10000)
-years = st.sidebar.slider("Periode Simulasi (tahun)", 5, 50, 20)
 
 # =========================
-# MODEL STRUKTUR PASAR
+# FIX TAHUN (2014–2024)
+# =========================
+years_range = list(range(2014, 2025))  # 2014 - 2024
+
+# =========================
+# MODEL PASAR
 # =========================
 if market == "Persaingan Sempurna":
     factor = 1.3
@@ -94,15 +94,12 @@ production = 500 * factor * (price / 200) * (1 - green_tax / 100) * (1 - discoun
 stock = stock0
 data = []
 
-for t in range(1, years + 1):
+for year in years_range:
     stock -= production
     if stock < 0:
         stock = 0
 
-    data.append([t, production, stock])
-
-    if stock == 0:
-        break
+    data.append([year, production, stock])
 
 df = pd.DataFrame(data, columns=["Tahun", "Produksi", "Stok"])
 
@@ -113,15 +110,15 @@ col1, col2, col3 = st.columns(3)
 
 col1.metric("⛏️ Produksi/Tahun", f"{production:,.0f} ton")
 col2.metric("📦 Sisa Stok", f"{stock:,.0f} ton")
-col3.metric("⏳ Waktu Habis", f"{len(df)} tahun")
+col3.metric("📅 Periode", "2014–2024")
 
 # =========================
-# GRAFIK (BIRU)
+# GRAFIK (FIX AMAN)
 # =========================
-st.subheader("📉 Tren Stok Nikel")
+st.subheader("📉 Tren Stok Nikel (2014–2024)")
 st.line_chart(df.set_index("Tahun")[["Stok"]], height=350)
 
-st.subheader("📊 Tren Produksi Nikel")
+st.subheader("📊 Tren Produksi Nikel (2014–2024)")
 st.area_chart(df.set_index("Tahun")[["Produksi"]], height=350)
 
 # =========================
@@ -130,11 +127,11 @@ st.area_chart(df.set_index("Tahun")[["Produksi"]], height=350)
 st.subheader("🧠 Analisis Ekonomi")
 
 if market == "Persaingan Sempurna":
-    text = "Pasar kompetitif → produksi tinggi dan stok cepat habis."
+    text = "Pasar kompetitif → produksi tinggi dan stok cepat menurun."
 elif market == "Monopoli":
-    text = "Monopoli → produksi lebih rendah dan sumber daya lebih awet."
+    text = "Monopoli → produksi lebih terkontrol sehingga stok lebih stabil."
 else:
-    text = "Oligopoli → produksi berada di tingkat menengah."
+    text = "Oligopoli → produksi berada di tingkat moderat."
 
 if green_tax > 20:
     text += " Green tax tinggi menekan produksi."
@@ -148,11 +145,11 @@ st.info(text)
 # =========================
 # DATA
 # =========================
-st.subheader("📋 Data Simulasi")
+st.subheader("📋 Tabel Data Simulasi (2014–2024)")
 st.dataframe(df, use_container_width=True)
 
 # =========================
 # FOOTER
 # =========================
 st.markdown("---")
-st.caption("© PT Vale Indonesia - Simulasi Ekonomi Nikel")
+st.caption("PT Vale Indonesia | Simulasi Ekonomi Nikel 2014–2024")
