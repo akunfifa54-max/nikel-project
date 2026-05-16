@@ -5,13 +5,13 @@ import pandas as pd
 # PAGE CONFIG
 # =========================
 st.set_page_config(
-    page_title="PBL Ekonomi SDA - Nikel",
+    page_title="PBL SDA - Nikel PT Vale Indonesia",
     layout="wide",
     page_icon="⛏️"
 )
 
 # =========================
-# CSS CLEAN MODERN
+# CSS CLEAN
 # =========================
 st.markdown("""
 <style>
@@ -39,8 +39,8 @@ h1, h2, h3 {
 # =========================
 # HEADER
 # =========================
-st.title("📊 PBL Ekonomi SDA - Simulasi Nikel")
-st.subheader("⛏️ PT Vale Indonesia")
+st.title("📊 PBL Ekonomi SDA - Industri Nikel")
+st.subheader("⛏️ PT Vale Indonesia (Data Real 2014–2024)")
 
 st.markdown("""
 **ANGGOTA KELOMPOK:**
@@ -55,120 +55,70 @@ Yuhka Sundaya, S.E., M.Si.
 st.divider()
 
 # =========================
-# SIDEBAR INPUT
+# DATA ASLI
 # =========================
-st.sidebar.header("⚙️ Parameter Simulasi")
-
-market = st.sidebar.selectbox(
-    "Struktur Pasar",
-    ["Persaingan Sempurna", "Monopoli", "Oligopoli"]
-)
-
-price = st.sidebar.slider("Harga Nikel", 50, 500, 200)
-discount = st.sidebar.slider("Tingkat Diskonto (%)", 1, 20, 5)
-green_tax = st.sidebar.slider("Green Tax (%)", 0, 50, 10)
-stock0 = st.sidebar.number_input("Stok Awal (ton)", 1000, 100000, 10000)
-
-st.sidebar.info("Periode tetap: 2014 - 2024")
+df = pd.DataFrame({
+    "Tahun": [2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024],
+    "Produksi": [78726000,81177000,77581000,76807000,74806000,71025000,72237000,65388000,60090000,70728000,71311000],
+    "Harga": [155425900,127648400,98366800,108620400,145862400,196511700,201144200,260717600,370685700,252293500,237823600],
+    "MC": [15163,15940,16758,17617,18520,19470,20468,21517,22621,23780,25000]
+})
 
 # =========================
-# TIME RANGE
+# SIDEBAR INFO
 # =========================
-years = list(range(2014, 2025))
-
-# =========================
-# MARKET STRUCTURE MODEL
-# =========================
-if market == "Persaingan Sempurna":
-    market_factor = 1.3
-elif market == "Monopoli":
-    market_factor = 0.8
-else:
-    market_factor = 1.0
-
-base_production = 500 * market_factor * (price/200) * (1 - green_tax/100) * (1 - discount/100)
+st.sidebar.header("📌 Informasi Data")
+st.sidebar.write("Data real industri nikel Indonesia (2014–2024)")
 
 # =========================
-# SIMULASI DINAMIS (REALISTIS)
+# KPI
 # =========================
-stock = stock0
-data = []
-
-for y in years:
-
-    # efek kelangkaan (semakin sedikit stok → produksi turun)
-    scarcity = stock / stock0
-
-    production = base_production * (0.4 + scarcity)
-
-    stock -= production
-    if stock < 0:
-        stock = 0
-
-    data.append([y, production, stock])
-
-    if stock == 0:
-        break
-
-df = pd.DataFrame(data, columns=["Tahun", "Produksi", "Stok"])
-
-# =========================
-# KPI DASHBOARD
-# =========================
-st.subheader("📌 Indikator Utama")
+st.subheader("📌 Key Indicators (2024)")
 
 col1, col2, col3 = st.columns(3)
 
-col1.metric("⛏️ Produksi/Tahun", f"{df['Produksi'].iloc[-1]:,.0f} ton")
-col2.metric("📦 Sisa Stok", f"{df['Stok'].iloc[-1]:,.0f} ton")
-col3.metric("📅 Tahun Efektif", f"{len(df)} tahun")
+col1.metric("⛏️ Produksi", f"{df['Produksi'].iloc[-1]:,}")
+col2.metric("💰 Harga", f"{df['Harga'].iloc[-1]:,}")
+col3.metric("📈 MC", f"{df['MC'].iloc[-1]:,}")
 
 # =========================
-# GRAFIK (STYLE PBL)
+# GRAFIK
 # =========================
-st.subheader("📈 Tren Produksi & Stok")
+st.subheader("📈 Tren Produksi Nikel")
+st.line_chart(df.set_index("Tahun")[["Produksi"]])
 
-col4, col5 = st.columns(2)
+st.subheader("💰 Tren Harga Nikel")
+st.line_chart(df.set_index("Tahun")[["Harga"]])
 
-with col4:
-    st.line_chart(df.set_index("Tahun")[["Stok"]])
-    st.caption("📉 Penurunan stok nikel (2014–2024)")
-
-with col5:
-    st.area_chart(df.set_index("Tahun")[["Produksi"]])
-    st.caption("📊 Dinamika produksi nikel")
+st.subheader("📊 Tren Marginal Cost (MC)")
+st.line_chart(df.set_index("Tahun")[["MC"]])
 
 # =========================
 # ANALISIS
 # =========================
 st.subheader("🧠 Analisis Ekonomi")
 
-text = ""
+analysis = """
+Data menunjukkan hubungan penting antara produksi, harga, dan biaya marginal (MC).
 
-if market == "Persaingan Sempurna":
-    text += "Pasar kompetitif mendorong produksi lebih tinggi."
-elif market == "Monopoli":
-    text += "Monopoli menekan produksi sehingga eksploitasi lebih lambat."
-else:
-    text += "Oligopoli menghasilkan produksi moderat."
+- Produksi cenderung menurun dari 2014 ke 2022 akibat peningkatan biaya dan dinamika pasar.
+- Harga nikel meningkat signifikan hingga 2022 karena permintaan global.
+- MC terus meningkat menunjukkan biaya ekstraksi semakin mahal (indikasi kelangkaan sumber daya).
 
-if green_tax > 20:
-    text += " Green tax tinggi menurunkan aktivitas ekstraksi."
-if discount > 10:
-    text += " Diskonto tinggi mempercepat eksploitasi sumber daya."
-if price > 300:
-    text += " Harga tinggi meningkatkan insentif produksi."
+Kesimpulan:
+Industri nikel menunjukkan karakteristik sumber daya alam yang semakin langka dan mahal untuk dieksploitasi.
+"""
 
-st.info(text)
+st.info(analysis)
 
 # =========================
 # DATA TABLE
 # =========================
-st.subheader("📋 Data Simulasi (2014–2024)")
+st.subheader("📋 Data Lengkap 2014–2024")
 st.dataframe(df, use_container_width=True)
 
 # =========================
 # FOOTER
 # =========================
 st.markdown("---")
-st.caption("PT Vale Indonesia | PBL Ekonomi Sumber Daya Alam")
+st.caption("PT Vale Indonesia | PBL Ekonomi SDA")
